@@ -1,0 +1,1 @@
+{"users":[{"id":1,"email":"debug@test.com","password_hash":"$argon2id$v=19$m=65536,t=3,p=1$NOeDis/vVZSmNyHawAtiBw$gDcnulm5g7r5Q4WdWi+MSGZNctgVmETeDWij9RzWbOk","name":"Debug User","role":"analyst","email_verified":true,"created_at":"2025-09-27T10:42:29.699Z","updated_at":"2025-09-27T10:42:29.699Z"}],"counter":2}
