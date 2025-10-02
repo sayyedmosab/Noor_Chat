@@ -2,6 +2,8 @@ import { ChatInterface } from '@/components/chat/ChatInterface'
 import { Header } from '@/components/layout/header'
 import { getCurrentUser, requireAuth } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ChatPage() {
   const user = await requireAuth()
   

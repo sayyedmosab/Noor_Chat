@@ -1,7 +1,7 @@
 import { createSupabaseServer } from './supabase/server'
 import { redirect } from 'next/navigation'
 
-export interface User {
+export interface AppUser {
   id: string
   email: string
   full_name: string
@@ -20,9 +20,9 @@ export interface Profile {
 }
 
 // Get current user (Server Components & API Routes)
-export async function getCurrentUser(): Promise<User | null> {
+export async function getCurrentUser(): Promise<AppUser | null> {
   try {
-    const supabase = createSupabaseServer()
+const supabase = await createSupabaseServer()
     
     // Get current session
     const { data: { user }, error: userError } = await supabase.auth.getUser()
@@ -58,7 +58,7 @@ export async function getCurrentUser(): Promise<User | null> {
 }
 
 // Require authentication (redirect if not authenticated)
-export async function requireAuth(): Promise<User> {
+export async function requireAuth(): Promise<AppUser> {
   const user = await getCurrentUser()
   
   if (!user) {
@@ -69,7 +69,7 @@ export async function requireAuth(): Promise<User> {
 }
 
 // Check if user has admin role
-export async function requireAdmin(): Promise<User> {
+export async function requireAdmin(): Promise<AppUser> {
   const user = await requireAuth()
   
   if (user.role !== 'admin') {
@@ -81,7 +81,7 @@ export async function requireAdmin(): Promise<User> {
 
 // Register new user
 export async function registerUser(email: string, password: string, fullName: string, role: 'analyst' | 'admin' = 'analyst') {
-  const supabase = createSupabaseServer()
+  const supabase = await createSupabaseServer()
   
   try {
     // Create user with Supabase Auth
@@ -154,7 +154,7 @@ export async function registerUser(email: string, password: string, fullName: st
 
 // Sign in user
 export async function signInUser(email: string, password: string) {
-  const supabase = createSupabaseServer()
+  const supabase = await createSupabaseServer()
   
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -175,7 +175,7 @@ export async function signInUser(email: string, password: string) {
 
 // Sign out user
 export async function signOutUser() {
-  const supabase = createSupabaseServer()
+  const supabase = await createSupabaseServer()
   
   try {
     const { error } = await supabase.auth.signOut()

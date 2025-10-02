@@ -11,16 +11,10 @@ interface Message {
   isLoading?: boolean
 }
 
-interface User {
-  id: string
-  email: string
-  full_name: string
-  username: string
-  role: 'analyst' | 'admin'
-}
+import { AppUser } from '@/lib/auth';
 
 interface ChatInterfaceProps {
-  user: User
+  user: AppUser
 }
 
 export function ChatInterface({ user }: ChatInterfaceProps) {
@@ -73,13 +67,14 @@ export function ChatInterface({ user }: ChatInterfaceProps) {
     setMessages(prev => [...prev, loadingMessage])
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch('/api/query', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          message: userMessage.content,
+          action: 'natural_language_query',
+          question: userMessage.content,
           userId: user.id,
           userRole: user.role
         })

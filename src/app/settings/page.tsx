@@ -450,7 +450,7 @@ export default function SettingsPage() {
                     type="checkbox"
                     checked={config.settings.allowMultipleQueryDbs}
                     className="rounded border-gray-300"
-                    readOnly
+                    disabled
                   />
                   <span className="ml-2 text-sm text-gray-700">Allow Multiple Query Databases</span>
                 </label>
@@ -462,7 +462,7 @@ export default function SettingsPage() {
                 <select 
                   value={config.settings.defaultUserRole}
                   className="px-3 py-2 border border-gray-300 rounded-md"
-                  readOnly
+                  disabled
                 >
                   <option value="analyst">Analyst</option>
                   <option value="admin">Admin</option>
@@ -476,7 +476,7 @@ export default function SettingsPage() {
                     type="checkbox"
                     checked={config.settings.enableRegistration}
                     className="rounded border-gray-300"
-                    readOnly
+                    disabled
                   />
                   <span className="ml-2 text-sm text-gray-700">Enable User Registration</span>
                 </label>

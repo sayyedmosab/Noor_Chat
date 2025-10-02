@@ -8,22 +8,21 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
-  result JSON;
   rec RECORD;
-  results JSON[] DEFAULT '{}';
+  results JSON[] := ARRAY[]::json[];
 BEGIN
-  -- Security check: only allow SELECT statements
-  IF LOWER(TRIM(sql_query)) NOT LIKE 'select%' AND LOWER(TRIM(sql_query)) NOT LIKE 'with%' THEN
+  -- Security check: only allow SELECT and WITH statements
+  IF NOT (LOWER(TRIM(sql_query)) LIKE 'select%' OR LOWER(TRIM(sql_query)) LIKE 'with%') THEN
     RAISE EXCEPTION 'Only SELECT and WITH queries are allowed';
   END IF;
 
   -- Execute the query and collect results
   FOR rec IN EXECUTE sql_query LOOP
-    results := array_append(results, row_to_json(rec));
+    results := array_append(results, row_to_json(rec)::json);
   END LOOP;
 
   -- Return as JSON array
-  RETURN array_to_json(results);
+  RETURN COALESCE(array_to_json(results), '[]'::json);
 EXCEPTION
   WHEN OTHERS THEN
     RAISE EXCEPTION 'Query execution failed: %', SQLERRM;

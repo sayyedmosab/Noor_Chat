@@ -4,7 +4,7 @@ import { Header } from '@/components/layout/header'
 export default function UnauthorizedPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header user={null} />
       
       <main className="container mx-auto px-4 py-16">
         <div className="max-w-md mx-auto text-center">

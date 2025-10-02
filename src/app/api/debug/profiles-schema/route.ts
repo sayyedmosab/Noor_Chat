@@ -3,7 +3,7 @@ import { createSupabaseServer } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createSupabaseServer()
+    const supabase = await createSupabaseServer()
     
     // Check what columns exist in profiles table
     const { data: schemaData, error: schemaError } = await supabase

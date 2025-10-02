@@ -55,7 +55,7 @@ export class MockDB {
     
     if (text.includes('INSERT INTO users')) {
       // Mock user creation
-      const [email, password_hash, name, role, email_verification_token] = params
+      const [email, password_hash, name, role, email_verification_token] = params as [string, string, string, 'analyst' | 'admin', string]
       const newUser: MockUser = {
         id: mockUserIdCounter++,
         email,
@@ -97,7 +97,7 @@ export class MockDB {
       // Mock user lookup by ID
       const id = params[0]
       console.log('🔍 MockDB: Looking for user ID:', id, 'Total users:', mockUsers.length, 'User emails:', mockUsers.map(u => u.email))
-      const user = mockUsers.find(u => u.id === parseInt(id))
+      const user = mockUsers.find(u => u.id === parseInt(id as string))
       console.log('🔍 MockDB: Found user:', user ? { id: user.id, email: user.email, verified: user.email_verified } : 'NOT FOUND')
       return {
         rows: user ? [{

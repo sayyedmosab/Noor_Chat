@@ -8,22 +8,21 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
-  result JSON;
   rec RECORD;
-  results JSON[] DEFAULT '{}';
+  results JSON[] := ARRAY[]::json[];
 BEGIN
-  -- Security check: only allow SELECT statements
-  IF LOWER(TRIM(sql_query)) NOT LIKE 'select%' AND LOWER(TRIM(sql_query)) NOT LIKE 'with%' THEN
+  -- Security check: only allow SELECT and WITH statements
+  IF NOT (LOWER(TRIM(sql_query)) LIKE 'select%' OR LOWER(TRIM(sql_query)) LIKE 'with%') THEN
     RAISE EXCEPTION 'Only SELECT and WITH queries are allowed';
   END IF;
 
   -- Execute the query and collect results
   FOR rec IN EXECUTE sql_query LOOP
-    results := array_append(results, row_to_json(rec));
+    results := array_append(results, row_to_json(rec)::json);
   END LOOP;
 
   -- Return as JSON array
-  RETURN array_to_json(results);
+  RETURN COALESCE(array_to_json(results), '[]'::json);
 EXCEPTION
   WHEN OTHERS THEN
     RAISE EXCEPTION 'Query execution failed: %', SQLERRM;
@@ -106,7 +105,7 @@ VALUES
   (3, CURRENT_TIMESTAMP - INTERVAL '10 days', 'completed', 499.99, 1, 'Chicago', 'IL'),
   (3, CURRENT_TIMESTAMP - INTERVAL '6 days', 'completed', 59.98, 3, 'Chicago', 'IL'),
   (3, CURRENT_TIMESTAMP - INTERVAL '1 day', 'processing', 824.97, 4, 'Chicago', 'IL'),
-  (4, CURRENT_TIMESTAMP - INTERVAL '8 days', 'completed', 345.20, 2, 'Houston', 'TX'),
+  (4, CURRENT_TIMESTAMP - INTERVAL '8 days', 'completed', 345.20,. 2, 'Houston', 'TX'),
   (5, CURRENT_TIMESTAMP - INTERVAL '4 days', 'completed', 675.80, 3, 'Phoenix', 'AZ')
 ON CONFLICT DO NOTHING;
 

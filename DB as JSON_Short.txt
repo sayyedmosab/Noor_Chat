@@ -1,0 +1,506 @@
+[
+  {
+    "schema": "public",
+    "table": "documentation_plans",
+    "primary_keys": "id",
+    "foreign_key_targets": "",
+    "foreign_key_count": 0,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "ent_capabilities",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.ent_capabilities",
+    "foreign_key_count": 1,
+    "estimated_row_count": 391,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "ent_change_adoption",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.ent_change_adoption",
+    "foreign_key_count": 1,
+    "estimated_row_count": 284,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "ent_culture_health",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.ent_culture_health",
+    "foreign_key_count": 1,
+    "estimated_row_count": 436,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "ent_it_systems",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.ent_it_systems",
+    "foreign_key_count": 1,
+    "estimated_row_count": 930,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "ent_org_units",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.ent_org_units",
+    "foreign_key_count": 1,
+    "estimated_row_count": 436,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "ent_processes",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.ent_processes",
+    "foreign_key_count": 1,
+    "estimated_row_count": 353,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "ent_projects",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.ent_projects",
+    "foreign_key_count": 1,
+    "estimated_row_count": 284,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "ent_risks",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.ent_capabilities, public.ent_risks",
+    "foreign_key_count": 2,
+    "estimated_row_count": 391,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "ent_vendors",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.ent_vendors",
+    "foreign_key_count": 1,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "forum_comments",
+    "primary_keys": "id",
+    "foreign_key_targets": "public.forum_comments",
+    "foreign_key_count": 1,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_capabilities_ent_it_systems_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.ent_capabilities, public.ent_it_systems",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_capabilities_ent_org_units_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.ent_capabilities, public.ent_org_units",
+    "foreign_key_count": 2,
+    "estimated_row_count": 470,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_capabilities_ent_processes_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.ent_capabilities, public.ent_processes",
+    "foreign_key_count": 2,
+    "estimated_row_count": 568,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_capabilities_ent_risks_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.ent_capabilities",
+    "foreign_key_count": 1,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_change_adoption_ent_it_systems_join",
+    "primary_keys": "",
+    "foreign_key_targets": "",
+    "foreign_key_count": 0,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_change_adoption_ent_org_units_join",
+    "primary_keys": "",
+    "foreign_key_targets": "",
+    "foreign_key_count": 0,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_change_adoption_ent_processes_join",
+    "primary_keys": "",
+    "foreign_key_targets": "",
+    "foreign_key_count": 0,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_it_systems_ent_vendors_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.ent_it_systems, public.ent_vendors",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_org_units_ent_culture_health_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.ent_culture_health, public.ent_org_units",
+    "foreign_key_count": 2,
+    "estimated_row_count": 436,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_org_units_ent_processes_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.ent_org_units, public.ent_processes",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_processes_ent_it_systems_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.ent_it_systems, public.ent_processes",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_projects_ent_change_adoption_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.ent_change_adoption, public.ent_projects",
+    "foreign_key_count": 2,
+    "estimated_row_count": 284,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_projects_ent_it_systems_join",
+    "primary_keys": "",
+    "foreign_key_targets": "",
+    "foreign_key_count": 0,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_projects_ent_org_units_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.ent_org_units, public.ent_projects",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_projects_ent_processes_join",
+    "primary_keys": "",
+    "foreign_key_targets": "",
+    "foreign_key_count": 0,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_risks_sec_performance_join",
+    "primary_keys": "",
+    "foreign_key_targets": "",
+    "foreign_key_count": 0,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_ent_risks_sec_policy_tools_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.sec_policy_tools",
+    "foreign_key_count": 1,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_sec_admin_records_sec_businesses_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.sec_admin_records, public.sec_businesses",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_sec_admin_records_sec_citizens_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.sec_admin_records, public.sec_citizens",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_sec_admin_records_sec_gov_entities_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.sec_admin_records, public.sec_gov_entities",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_sec_businesses_sec_data_transactions_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.sec_businesses, public.sec_data_transactions",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_sec_citizens_sec_data_transactions_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.sec_citizens, public.sec_data_transactions",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_sec_data_transactions_sec_performance_join",
+    "primary_keys": "",
+    "foreign_key_targets": "",
+    "foreign_key_count": 0,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_sec_gov_entities_sec_data_transactions_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.sec_data_transactions, public.sec_gov_entities",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_sec_objectives_sec_performance_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.sec_objectives, public.sec_performance",
+    "foreign_key_count": 2,
+    "estimated_row_count": 75,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_sec_objectives_sec_policy_tools_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.sec_objectives, public.sec_policy_tools",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_sec_performance_ent_capabilities_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.ent_capabilities, public.sec_performance",
+    "foreign_key_count": 2,
+    "estimated_row_count": 225,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_sec_policy_tools_ent_capabilities_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.ent_capabilities, public.sec_policy_tools",
+    "foreign_key_count": 2,
+    "estimated_row_count": 225,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "jt_sec_policy_tools_sec_admin_records_join",
+    "primary_keys": "uid",
+    "foreign_key_targets": "public.sec_admin_records, public.sec_policy_tools",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "sec_admin_records",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.sec_admin_records",
+    "foreign_key_count": 1,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "sec_businesses",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.sec_businesses",
+    "foreign_key_count": 1,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "sec_citizens",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.sec_citizens",
+    "foreign_key_count": 1,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "sec_data_transactions",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.sec_data_transactions, public.sec_performance",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "sec_gov_entities",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.sec_gov_entities",
+    "foreign_key_count": 1,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "sec_objectives",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.sec_objectives, public.sec_performance",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "sec_performance",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.sec_performance",
+    "foreign_key_count": 1,
+    "estimated_row_count": 225,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "sec_policy_tools",
+    "primary_keys": "id, year",
+    "foreign_key_targets": "public.sec_policy_tools",
+    "foreign_key_count": 1,
+    "estimated_row_count": 225,
+    "rls_enabled": true
+  },
+  {
+    "schema": "public",
+    "table": "temp_quarterly_dashboard_data",
+    "primary_keys": "id",
+    "foreign_key_targets": "",
+    "foreign_key_count": 0,
+    "estimated_row_count": 160,
+    "rls_enabled": true
+  },
+  {
+    "schema": "storage",
+    "table": "buckets",
+    "primary_keys": "id",
+    "foreign_key_targets": "",
+    "foreign_key_count": 0,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "storage",
+    "table": "buckets_analytics",
+    "primary_keys": "id",
+    "foreign_key_targets": "",
+    "foreign_key_count": 0,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "storage",
+    "table": "migrations",
+    "primary_keys": "",
+    "foreign_key_targets": "",
+    "foreign_key_count": 0,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "storage",
+    "table": "objects",
+    "primary_keys": "id",
+    "foreign_key_targets": "storage.buckets",
+    "foreign_key_count": 1,
+    "estimated_row_count": 105,
+    "rls_enabled": true
+  },
+  {
+    "schema": "storage",
+    "table": "prefixes",
+    "primary_keys": "bucket_id, level, name",
+    "foreign_key_targets": "storage.buckets",
+    "foreign_key_count": 1,
+    "estimated_row_count": 5,
+    "rls_enabled": true
+  },
+  {
+    "schema": "storage",
+    "table": "s3_multipart_uploads",
+    "primary_keys": "id",
+    "foreign_key_targets": "storage.buckets",
+    "foreign_key_count": 1,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  },
+  {
+    "schema": "storage",
+    "table": "s3_multipart_uploads_parts",
+    "primary_keys": "id",
+    "foreign_key_targets": "storage.buckets, storage.s3_multipart_uploads",
+    "foreign_key_count": 2,
+    "estimated_row_count": -1,
+    "rls_enabled": true
+  }
+]

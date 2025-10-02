@@ -2,8 +2,8 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 // Create Supabase server client for Auth Database (Server Components & API Routes)
-export function createSupabaseServer() {
-  const cookieStore = cookies()
+export async function createSupabaseServer() {
+  const cookieStore = await cookies()
 
   return createServerClient(
     process.env.SUPABASE_AUTH_URL!,
@@ -30,8 +30,8 @@ export function createSupabaseServer() {
 }
 
 // Create Supabase server client for Query Database (for data analysis)
-export function createQuerySupabaseServer() {
-  const cookieStore = cookies()
+export async function createQuerySupabaseServer() {
+  const cookieStore = await cookies()
 
   return createServerClient(
     process.env.SUPABASE_QUERY_URL!,

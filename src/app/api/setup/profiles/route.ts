@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
   try {
     const { action } = await request.json()
     
-    const supabase = createSupabaseServer()
+    const supabase = await createSupabaseServer()
     
     switch (action) {
       case 'test_profiles':

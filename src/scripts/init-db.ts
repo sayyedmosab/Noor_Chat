@@ -1,5 +1,5 @@
 import { initializeDB, getDB } from '@/lib/db'
-import { createUser } from '@/lib/auth'
+import { registerUser } from '@/lib/auth'
 
 async function main() {
   try {
@@ -10,6 +10,10 @@ async function main() {
     
     // Create admin user if it doesn't exist
     const db = getDB()
+    if (!db) {
+      console.log('Mock mode enabled, skipping admin user creation')
+      process.exit(0)
+    }
     const existingAdmin = await db.query(
       'SELECT id FROM users WHERE email = $1',
       ['admin@chatcanvas.local']
@@ -17,7 +21,7 @@ async function main() {
     
     if (existingAdmin.rows.length === 0) {
       console.log('Creating admin user...')
-      const { user } = await createUser(
+      const { user } = await registerUser(
         'admin@chatcanvas.local',
         'admin123456',
         'Administrator',

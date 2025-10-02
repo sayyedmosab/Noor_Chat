@@ -1,5 +1,6 @@
 import { Pool } from 'pg'
 import Redis from 'redis'
+import { getMockRedis } from './db-mock'
 
 // Check if we should use mock implementations
 const useMock = process.env.SKIP_DB_CONNECTION === 'true'

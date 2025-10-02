@@ -1,7 +1,7 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 
-export interface User {
+export interface SupabaseUser {
   id: string
   email: string
   name: string
@@ -47,7 +47,7 @@ export function getAuthSupabaseClient() {
 }
 
 // Get current user from Supabase session
-export async function getCurrentUser(): Promise<User | null> {
+export async function getCurrentUser(): Promise<SupabaseUser | null> {
   try {
     const supabase = getAuthSupabase()
     
@@ -153,7 +153,7 @@ export async function registerUser(email: string, password: string, name: string
 }
 
 // Authenticate user with Supabase Auth
-export async function authenticateUser(email: string, password: string): Promise<{ user: User; session: any } | null> {
+export async function authenticateUser(email: string, password: string): Promise<{ user: SupabaseUser; session: any } | null> {
   const supabase = getAuthSupabase()
   
   try {
@@ -179,7 +179,7 @@ export async function authenticateUser(email: string, password: string): Promise
       return null
     }
     
-    const user: User = {
+    const user: SupabaseUser = {
       id: data.user.id,
       email: data.user.email || '',
       name: profile.name,

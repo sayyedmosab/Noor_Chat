@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { getCurrentUser } from '@/lib/auth'
 import { Header } from '@/components/layout/header'
 
+export const dynamic = 'force-dynamic'
+
 export default async function HomePage() {
   const user = await getCurrentUser()
 
@@ -76,15 +78,9 @@ function UnauthenticatedView() {
   )
 }
 
-interface User {
-  id: string
-  email: string
-  full_name: string
-  username: string
-  role: 'analyst' | 'admin'
-}
+import { AppUser } from '@/lib/auth';
 
-function AuthenticatedView({ user }: { user: User }) {
+function AuthenticatedView({ user }: { user: AppUser }) {
   return (
     <div className="max-w-6xl mx-auto">
       <div className="bg-white rounded-lg shadow-lg p-6 mb-8">

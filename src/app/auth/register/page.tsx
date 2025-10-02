@@ -34,8 +34,8 @@ export default function RegisterPage() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Full name is required'
+    if (!formData.name.trim() || formData.name.trim().length < 2) {
+      newErrors.name = 'Full name must be at least 2 characters'
     }
 
     if (!formData.email.trim()) {
@@ -71,7 +71,7 @@ export default function RegisterPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: formData.name,
+          fullName: formData.name,
           email: formData.email,
           password: formData.password,
         }),

@@ -22,6 +22,12 @@ export async function POST(request: NextRequest) {
     }
 
     const db = getDB()
+    if (!db) {
+      return NextResponse.json(
+        { error: 'Database connection not available' },
+        { status: 500 }
+      )
+    }
     
     // Verify the user by email (development only)
     const result = await db.query(

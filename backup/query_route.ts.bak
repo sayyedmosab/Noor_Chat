@@ -1,0 +1,124 @@
+// Backup of orchestrator before Gemini SDK refactor and architectural review
+// Original: /src/app/api/query/route.ts
+// Date: 2025-10-01
+// --- BEGIN FILE ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getCurrentUser } from '@/lib/auth';
+import { getQueryEngine } from '@/lib/database/query-engine';
+import { aiTools } from '@/lib/ai-tools';
+import { GoogleGenAI, GenerationConfig, Content, FinishReason, Part } from '@google/genai';
+
+export async function POST(request: NextRequest) {
+	try {
+		const body = await request.json();
+		const { action, question, history } = body;
+
+		if (action === 'test_connection') {
+			console.log('Running database connection test...');
+			const queryEngine = await getQueryEngine();
+			const result = await queryEngine.testConnection();
+			return NextResponse.json(result);
+		}
+
+		let user = await getCurrentUser();
+		if (!user) {
+			console.warn('Bypassing auth: No authenticated user found. Creating mock user for local testing.');
+			user = { id: 'local-test-user', role: 'admin' }; 
+		}
+
+		if (action !== 'natural_language_query') {
+			return NextResponse.json({ error: `Invalid action: ${action}` }, { status: 400 });
+		}
+
+		if (!question) {
+			return NextResponse.json({ error: 'Question is required' }, { status: 400 });
+		}
+
+		const result = await naturalLanguageQueryOrchestrator(question, user, history || []);
+
+		return NextResponse.json(result);
+
+	} catch (error) {
+		console.error('[Query API Error]', error);
+		const errorMessage = error instanceof Error ? error.message : 'An internal server error occurred';
+		return NextResponse.json({ error: errorMessage }, { status: 500 });
+	}
+}
+
+/**
+ * Orchestrates the multi-turn, tool-calling conversation with the Gemini model
+ * using the correct SDK chat session pattern.
+ */
+async function naturalLanguageQueryOrchestrator(question: string, user: any, initialHistory: Content[]) {
+	const apiKey = process.env.GEMINI_API_KEY;
+	if (!apiKey) {
+		throw new Error('AI service not configured. GEMINI_API_KEY is missing.');
+	}
+
+	const queryEngine = await getQueryEngine();
+	const worldviewMap = queryEngine.getWorldviewMap();
+	const genAI = new GoogleGenAI(apiKey);
+
+	const systemInstruction = {
+		role: 'system',
+		parts: [{
+			text: `You are a world-class data analysis agent. Your goal is to help the user analyze their database by generating and executing SQL queries. You must follow the rules and protocol defined in the Worldview Map provided in the users message. Your final response to the user must be a conversational analysis of the data. To execute a query, you MUST call the execute_sql function. First, explain the query you are about to run. Then, immediately call the execute_sql function to run it. Do not ask for permission.`
+		}]
+	};
+
+	const model = genAI.getGenerativeModel({
+		model: 'gemini-2.0-flash-lite',
+		tools: [{ functionDeclarations: aiTools }],
+		toolConfig: { functionCallingConfig: { mode: 'ANY' } },
+		systemInstruction,
+	});
+
+	const chat = model.startChat({
+		history: initialHistory,
+	});
+
+	const firstMessage: Part[] = [
+		{ text: `Worldview Map: ${JSON.stringify(worldviewMap)}` },
+		{ text: `Question: ${question}` },
+	];
+
+	let result = await chat.sendMessage(firstMessage);
+
+	const MAX_TURNS = 5;
+	for (let i = 0; i < MAX_TURNS; i++) {
+		console.log(`\n--- Turn ${i + 1}: AI Response ---\n`, JSON.stringify(result.response, null, 2));
+
+		const response = result.response;
+		const functionCalls = response.candidates?.[0]?.content?.parts?.filter(p => p.functionCall).map(p => p.functionCall);
+
+		if (functionCalls && functionCalls.length > 0) {
+			const toolResponses: Part[] = [];
+			for (const call of functionCalls) {
+				let functionResponsePart;
+				if (call.name === 'get_detailed_schema') {
+					const tables = call.args.tables;
+					const detailedSchema = await queryEngine.getDetailedSchemaFromRepository(tables);
+					functionResponsePart = { functionResponse: { name: 'get_detailed_schema', response: { detailed_schema: detailedSchema } } };
+				} else if (call.name === 'execute_sql') {
+					const sql = call.args.sql;
+					const queryResult = await queryEngine.executeQuery(sql);
+					functionResponsePart = { functionResponse: { name: 'execute_sql', response: { query_result: queryResult } } };
+				} else if (call.name === 'ask_clarifying_question') {
+					return { status: 'clarification_needed', text: call.args.question };
+				} else {
+					functionResponsePart = { functionResponse: { name: call.name, response: { error: `Unknown tool: ${call.name}` } } };
+				}
+				toolResponses.push(functionResponsePart);
+			}
+			result = await chat.sendMessage(toolResponses);
+		} else {
+			return {
+				status: 'final_response',
+				text: response.text(),
+			};
+		}
+	}
+
+	throw new Error('Agent could not reach a final answer after multiple turns.');
+}
+// Backup of /api/query/route.ts

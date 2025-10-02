@@ -1,87 +1,71 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentUser } from '@/lib/auth'
+import { NextRequest, NextResponse } from 'next/server';
+import { getCurrentUser } from '@/lib/auth';
+import { GoogleGenAI } from '@google/genai';
 
 // Helper function to format query results for display
 function formatQueryResults(data: any[]): string {
   if (!data || data.length === 0) {
-    return 'No data found.'
+    return 'No data found.';
   }
-
-  // Get column names from first row
-  const columns = Object.keys(data[0])
-  
-  // Limit display to first 10 rows for readability
-  const displayData = data.slice(0, 10)
-  
-  // Create simple table format
-  let result = '\n**Data Sample:**\n'
-  
-  // Headers
-  result += '| ' + columns.join(' | ') + ' |\n'
-  result += '| ' + columns.map(() => '---').join(' | ') + ' |\n'
-  
-  // Rows
+  const columns = Object.keys(data[0]);
+  const displayData = data.slice(0, 10);
+  let result = '\n**Data Sample:**\n';
+  result += '| ' + columns.join(' | ') + ' |\n';
+  result += '| ' + columns.map(() => '---').join(' | ') + ' |\n';
   displayData.forEach(row => {
     const values = columns.map(col => {
-      const value = row[col]
-      if (value === null || value === undefined) return 'null'
+      const value = row[col];
+      if (value === null || value === undefined) return 'null';
       if (typeof value === 'string' && value.length > 50) {
-        return value.substring(0, 47) + '...'
+        return value.substring(0, 47) + '...';
       }
-      return String(value)
-    })
-    result += '| ' + values.join(' | ') + ' |\n'
-  })
-  
+      return String(value);
+    });
+    result += '| ' + values.join(' | ') + ' |\n';
+  });
   if (data.length > 10) {
-    result += `\n_Showing first 10 rows of ${data.length} total rows._`
+    result += `\n_Showing first 10 rows of ${data.length} total rows._`;
   }
-  
-  return result
+  return result;
 }
 
-// Simple Gemini API integration using fetch (Cloudflare Workers compatible)
+/**
+ * Generates a response using the Gemini API for simple, non-agentic chats.
+ * Uses the new `@google/genai` SDK.
+ */
 async function generateWithGemini(prompt: string, apiKey: string): Promise<string> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
-  
-  const body = {
-    contents: [{
-      parts: [{ text: prompt }]
-    }],
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 2048,
-      topP: 0.8,
-      topK: 40
-    },
-    safetySettings: [
-      {
-        category: 'HARM_CATEGORY_HARASSMENT',
-        threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-      },
-      {
-        category: 'HARM_CATEGORY_HATE_SPEECH',
-        threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+  try {
+  const genAI = new GoogleGenAI({ apiKey });
+    const result = await genAI.models.generateContent({
+      model: 'gemini-2.0-flash-lite',
+      contents: [{ role: "user", parts: [{ text: prompt }] }]
+    });
+    // Extract text from candidates array (SDK reference)
+    let text = '';
+    if (result.candidates && result.candidates.length > 0) {
+      const candidate = result.candidates[0];
+      if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+        text = candidate.content.parts[0].text || '';
       }
-    ]
+    }
+    return text;
+  } catch (error) {
+    console.error('Error in generateWithGemini:', error);
+    if (error instanceof Error) {
+      if (error.message.includes('403')) {
+        return 'API key invalid or quota exceeded';
+      } else if (error.message.includes('400')) {
+        return 'Invalid request format for Gemini API.';
+      } else if (error.message.includes('429')) {
+        return 'Rate limit exceeded. Please try again in a moment.';
+      }
+    }
+    return "I'm having trouble connecting to my knowledge base right now. Please try again in a moment.";
   }
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  })
-
-  if (!response.ok) {
-    const errorText = await response.text()
-    throw new Error(`Gemini API error ${response.status}: ${errorText}`)
-  }
-
-  const data = await response.json()
-  return data.candidates?.[0]?.content?.parts?.[0]?.text ?? 'No response generated'
 }
 
 function createSystemPrompt(userRole: 'analyst' | 'admin'): string {
+  // This function remains the same, providing the initial context for the AI.
   const basePrompt = `You are an intelligent data analysis assistant for a Chat + Canvas application. You help users analyze data, answer questions, and provide insights.
 
 USER ROLE: ${userRole === 'admin' ? 'Super Admin (full access)' : 'Super Analyst (read-only)'}
@@ -120,147 +104,107 @@ RESPONSE FORMAT:
 - For concepts: Provide clear explanations with examples
 - For errors: Explain what went wrong and suggest alternatives
 
-Remember: You're helping with real data analysis. Be practical and educational.`
-
-  return basePrompt
+Remember: Youre helping with real data analysis. Be practical and educational.`;
+  return basePrompt;
 }
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    // Parse request body
-    const { message, userId, userRole } = await request.json()
-    
+    const { message, userId, userRole } = await request.json();
     if (!message || typeof message !== 'string') {
-      return NextResponse.json(
-        { error: 'Message is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
-
-    // Verify user ID matches authenticated user
     if (userId !== user.id) {
-      return NextResponse.json(
-        { error: 'User ID mismatch' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'User ID mismatch' }, { status: 403 });
     }
 
-    // Get Gemini API key from environment
-    const apiKey = process.env.GEMINI_API_KEY
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      console.error('GEMINI_API_KEY not configured')
-      return NextResponse.json(
-        { error: 'AI service not configured' },
-        { status: 500 }
-      )
+      console.error('GEMINI_API_KEY not configured');
+      return NextResponse.json({ error: 'AI service not configured' }, { status: 500 });
     }
 
-    // Create system prompt based on user role
-    const systemPrompt = createSystemPrompt(userRole)
-    
-    // Combine system prompt with user message
-    const fullPrompt = `${systemPrompt}
 
-USER QUESTION: ${message}
-
-Please provide a helpful response:`
-
-    // Check if this looks like a data query request
-    const isDataQuery = message.toLowerCase().includes('table') || 
+    const isDataQuery = message.toLowerCase().includes('table') ||
                        message.toLowerCase().includes('query') ||
                        message.toLowerCase().includes('data') ||
                        message.toLowerCase().includes('show me') ||
                        message.toLowerCase().includes('find') ||
-                       message.toLowerCase().includes('how many')
+                       message.toLowerCase().includes('how many');
 
-    let response: string
+    let responseText: string;
 
     if (isDataQuery) {
-      // Try to handle as a database query
+      // For data queries, load worldview map and DB schema summary for context
       try {
-        const queryResponse = await fetch(`${process.env.APP_URL || 'http://localhost:3001'}/api/query`, {
+        // Load worldview map only
+        const worldviewMapRaw = await import('fs/promises').then(fs => fs.readFile(process.cwd() + '/worldviewmap.json', 'utf-8'));
+        const worldviewMap = JSON.parse(worldviewMapRaw);
+
+        // History: for now, always start with empty array, but type explicitly
+        const history: Array<{ role: string; content: string }> = [];
+
+        // Instructions/messages for orchestrator
+        const isFirstQuery = history.length === 0;
+        const orchestratorInstructions = isFirstQuery
+          ? 'This is the first query in the session. Use only the worldview map for reasoning. If you need more details, ask for specific tables or columns.'
+          : 'This is a follow-up query. Use the worldview map and provided history for context.';
+
+        const queryPayload = {
+          action: 'natural_language_query',
+          question: message,
+          worldviewMap,
+          history,
+          instructions: orchestratorInstructions
+        };
+
+  const queryBaseUrl = process.env.APP_URL || 'http://localhost:3101';
+  const queryResponse = await fetch(`${queryBaseUrl}/api/query`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'natural_language_query',
-            question: message
-          })
-        })
+          body: JSON.stringify(queryPayload),
+        });
 
         if (queryResponse.ok) {
-          const queryData = await queryResponse.json()
-          
-          if (queryData.success) {
-            // Format the response with query results
-            response = `I found the following data for your question: "${message}"
-
-**Generated SQL Query:**
-\`\`\`sql
-${queryData.generatedSQL}
-\`\`\`
-
-**Explanation:** ${queryData.explanation}
-
-**Results:** Found ${queryData.rowCount} rows in ${queryData.executionTime}ms
-
-${queryData.data && queryData.data.length > 0 ? 
-  formatQueryResults(queryData.data) : 
-  'No data returned from the query.'}
-
-Would you like me to analyze this data further or help with additional queries?`
-          } else {
-            // Query failed, fall back to regular chat
-            response = await generateWithGemini(fullPrompt + `\n\nNote: I tried to query the database but encountered an error: ${queryData.error}. Let me help you with general guidance instead.`, apiKey)
-          }
+          const queryData = await queryResponse.json();
+          responseText = queryData.text || 'I was unable to process your data request.';
         } else {
-          // API call failed, fall back to regular chat
-          response = await generateWithGemini(fullPrompt, apiKey)
+          const errorData = await queryResponse.text();
+          console.error('Error from /api/query:', errorData);
+          responseText = 'I encountered an error while trying to process your data request.';
         }
       } catch (queryError) {
-        // Error in query attempt, fall back to regular chat
-        response = await generateWithGemini(fullPrompt, apiKey)
+        console.error('Failed to fetch /api/query:', queryError);
+        responseText = 'The data analysis service seems to be unavailable right now.';
       }
     } else {
-      // Handle as regular chat
-      response = await generateWithGemini(fullPrompt, apiKey)
+      // For simple chats, use the local generateWithGemini function.
+      const systemPrompt = createSystemPrompt(userRole);
+      const fullPrompt = `${systemPrompt}\n\nUSER QUESTION: ${message}\n\nPlease provide a helpful response:`;
+      responseText = await generateWithGemini(fullPrompt, apiKey);
     }
 
     return NextResponse.json({
-      response,
+      response: responseText,
       timestamp: new Date().toISOString(),
       userId: user.id,
-      hasDataQuery: isDataQuery
-    })
+      hasDataQuery: isDataQuery,
+    });
 
   } catch (error) {
-    console.error('Chat API error:', error)
-    
+    console.error('Chat API error:', error);
     if (error instanceof Error) {
       if (error.message.includes('403')) {
-        return NextResponse.json(
-          { error: 'API key invalid or quota exceeded' },
-          { status: 500 }
-        )
+        return NextResponse.json({ error: 'API key invalid or quota exceeded' }, { status: 500 });
       } else if (error.message.includes('429')) {
-        return NextResponse.json(
-          { error: 'Rate limit exceeded. Please try again in a moment.' },
-          { status: 429 }
-        )
+        return NextResponse.json({ error: 'Rate limit exceeded. Please try again in a moment.' }, { status: 429 });
       }
     }
-
-    return NextResponse.json(
-      { error: 'Failed to generate response' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to generate response' }, { status: 500 });
   }
 }
